@@ -1,0 +1,108 @@
+@import './fonts.css';
+
+:root {
+  --font-arimo: 'Arimo', system-ui, -apple-system, sans-serif;
+  --font-bebas: 'Bebas Neue', sans-serif;
+  --font-lack: 'Lack', sans-serif;
+
+  --dark-color: #262626;
+  --light-color: #FFFFFF;
+  --sidebar-color: #F8F8F8;
+  --red-color: #CC313D;
+  --green-color: #2B9348;
+  --yellow-color: #FFBF3B;
+}
+
+/* =========================================
+   1. ГЛОБАЛЬНЫЙ СБРОС И BOX-SIZING
+   ========================================= */
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+* {
+  margin: 0;
+  padding: 0;
+}
+
+/* =========================================
+   2. БАЗОВЫЕ НАСТРОЙКИ ДОКУМЕНТА (html, body)
+   ========================================= */
+html {
+  scrollbar-gutter: stable;
+}
+
+body {
+  min-height: 100vh;
+
+  font-family: var(--font-arimo), sans-serif;
+  line-height: 1.5;
+  color: var(--dark-color);
+  background-color: var(--light-color);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* =========================================
+   3. МЕДИА-ЭЛЕМЕНТЫ
+   ========================================= */
+img,
+picture,
+video,
+canvas,
+svg {
+  display: block;
+  max-width: 100%;
+  height: auto;
+}
+
+/* =========================================
+   4. ФОРМЫ И ИНТЕРАКТИВНЫЕ ЭЛЕМЕНТЫ
+   ========================================= */
+input,
+button,
+textarea,
+select {
+  font: inherit;
+  color: inherit;
+  letter-spacing: inherit;
+}
+
+button {
+  border: none;
+  background: none;
+  cursor: pointer;
+}
+
+textarea {
+  resize: vertical;
+}
+
+/* =========================================
+   5. СПИСКИ И ССЫЛКИ
+   ========================================= */
+ul,
+ol {
+  list-style: none;
+}
+
+a {
+  text-decoration: none;
+  color: inherit;
+}
+
+/* =========================================
+   6. ДОСТУПНОСТЬ (ACCESSIBILITY)
+   ========================================= */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
