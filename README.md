@@ -1,73 +1,44 @@
-# React + TypeScript + Vite
+# 📑 Сопоставитель товаров
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+Веб-приложение для автоматизированного сопоставления пользовательских списков товаров с эталонной базой данных. Разработано в рамках университетского проекта (УрФУ).
 
-Currently, two official plugins are available:
+Приложение позволяет загружать файлы с номенклатурой, визуализировать результаты нечеткого поиска (fuzzy matching) и вручную корректировать статусы сопоставления.
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+## 🛠 Технологии
 
-## React Compiler
+В проекте используется современный стек frontend-разработки:
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+* **Ядро:** [React 18](https://react.dev/)
+* **Язык:** [TypeScript](https://www.typescriptlang.org/) (строгая типизация бизнес-логики и UI)
+* **Сборщик:** [Vite](https://vitejs.dev/) (обеспечивает мгновенный HMR и быструю сборку)
+* **Стилизация:** CSS Modules + нативные CSS переменные (изолированные стили без тяжелых UI-библиотек)
+* **Валидация данных:** [Zod](https://zod.dev/) (проверка схем данных, приходящих от API)
+* **Шрифты:** Локальное подключение (Arimo, Bebas Neue, Lack)
 
-## Expanding the ESLint configuration
+## ⚙️ Требования
 
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
+Для локального запуска проекта на вашем компьютере должны быть установлены:
 
-```js
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
+* **Node.js**: версия 22.0.0 или выше (рекомендуется v22.13.1)
+* **npm**: версия 10.0.0 или выше (идет в комплекте с Node.js)
 
-      // Remove tseslint.configs.recommended and replace with this
-      tseslint.configs.recommendedTypeChecked,
-      // Alternatively, use this for stricter rules
-      tseslint.configs.strictTypeChecked,
-      // Optionally, add this for stylistic rules
-      tseslint.configs.stylisticTypeChecked,
+## 🚀 Быстрый старт
 
-      // Other configs...
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+Выполните следующие команды в терминале, чтобы развернуть проект локально:
+
+1. **Клонируйте репозиторий**
+2. **Установите зависимости**:
+```bash
+   npm install
+```
+4. **Запустите сервер разработки и перейдите по адресу: http://localhost:5173**:
+```bash
+npm run dev
 ```
 
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
-
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
-
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-      // Enable lint rules for React
-      reactX.configs['recommended-typescript'],
-      // Enable lint rules for React DOM
-      reactDom.configs.recommended,
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
-```
+## 📁 Структура проекта
+- /src/api/ — методы для работы с сетью и эмуляция бэкенда.
+- /src/assets/ — статические файлы (шрифты, иконки, изображения).
+- /src/components/ — изолированные UI-компоненты (кнопки, таблицы, загрузчики).
+- /src/hooks/ — кастомные React-хуки для инкапсуляции бизнес-логики.
+- /src/types/ — глобальные TypeScript интерфейсы и Zod-схемы.
