@@ -10,7 +10,7 @@ import { DownloadModal } from "../components/matcher/DownloadModal/DownloadModal
 import styles from './MainPage.module.css';
 
 export const MainPage = () => {
-  const [currentScreen, setCurrentScreen] = useState<ScreenState>('upload');
+  const [currentScreen, setCurrentScreen] = useState<ScreenState>('table');
   const [isModalOpen, setIsModalOpen] = useState(false);
 
   return (
