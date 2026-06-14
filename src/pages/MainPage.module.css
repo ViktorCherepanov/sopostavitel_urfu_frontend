@@ -1,0 +1,10 @@
+.pageContainer {
+  flex-grow: 1;
+  width: 100%;
+  min-height: 100vh;
+  padding: 24px;
+  background-image: url("/img/bg-main-screen.png");
+  position: relative;
+  display: flex;
+  flex-direction: column;
+}

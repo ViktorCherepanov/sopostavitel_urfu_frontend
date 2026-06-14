@@ -5,7 +5,7 @@ import {
 
 const MOCK_API_DELAY = 1500;
 
-export const uploadFileToMatch = async (file: File):Promise<ProductMatchResult[]> => {
+export const uploadFileToMatch = async ():Promise<ProductMatchResult[]> => {
   await new Promise((resolve) => setTimeout(resolve, MOCK_API_DELAY));
 
   const mockResponse = [

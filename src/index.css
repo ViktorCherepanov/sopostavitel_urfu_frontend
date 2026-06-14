@@ -80,6 +80,21 @@ textarea {
   resize: vertical;
 }
 
+.brutal-shadow {
+  box-shadow: 5px 5px 0 var(--dark-color);
+  transition: box-shadow 0.2s ease, transform 0.2s ease;
+}
+
+.brutal-shadow:hover {
+  box-shadow: 2px 2px 0 var(--dark-color);
+  transform: translate(3px, 3px);
+}
+
+.brutal-shadow:active {
+  box-shadow: 0 0 0 var(--dark-color);
+  transform: translate(5px, 5px);
+}
+
 /* =========================================
    5. СПИСКИ И ССЫЛКИ
    ========================================= */

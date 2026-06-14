@@ -12,7 +12,7 @@ export const useProductMatcher = () => {
     setError(null);
 
     try {
-      const result = await uploadFileToMatch(file);
+      const result = await uploadFileToMatch();
       setData(result);
     } catch (error) {
       console.error('Ошибка при обработке файла: ', error);
