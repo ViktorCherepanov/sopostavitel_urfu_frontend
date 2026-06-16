@@ -2,8 +2,11 @@
   display: flex;
   flex-direction: column;
   width: 100%;
+  flex: 1;
+  min-height: 0;
   gap: 24px;
   box-sizing: border-box;
+  justify-content: space-between;
 }
 
 .header {
@@ -13,6 +16,7 @@
   align-items: center;
   flex-wrap: nowrap;
   gap: 20px;
+  flex-shrink: 0;
 }
 
 .titleGroup {
@@ -82,10 +86,12 @@
 }
 
 .tableWrapper {
+  flex: 1;
+  min-height: 0;
   width: 100%;
   border: 1.5px solid var(--dark-color);
   background-color: var(--light-color);
-  overflow-x: auto;
+  overflow: auto;
 }
 
 .table {
@@ -105,12 +111,16 @@
 }
 
 .table th {
+  position: sticky;
+  top: 0;
+  z-index: 5;
   font-family: var(--font-bebas), sans-serif;
   font-size: 18px;
   font-weight: 500;
   letter-spacing: 0.05em;
   background-color: var(--sidebar-color);
   user-select: none;
+  isolation: isolate;
 }
 
 .sortableHeader {
@@ -119,10 +129,12 @@
 }
 
 .sortableHeader:hover {
-  background-color: rgba(0, 0, 0, 0.05);
+  background-color: #e8e8e8;
+  background-color: color-mix(in srgb, var(--sidebar-color) 95%, black 5%);
 }
 
 .table tbody tr {
+  -webkit-transition: background-color 0.1s ease;
   transition: background-color 0.1s ease;
 }
 
@@ -154,6 +166,7 @@
   align-items: center;
   flex-wrap: wrap;
   gap: 16px;
+  flex-shrink: 0;
 }
 
 .pagination {
@@ -240,8 +253,9 @@
   pointer-events: none;
   opacity: 0;
   visibility: hidden;
-  transition: opacity 0.2s ease, visibility 0.2s ease, transform 0.2s ease;
   z-index: 10;
+  -webkit-transition: opacity 0.2s ease, visibility 0.2s ease, transform 0.2s ease;
+  transition: opacity 0.2s ease, visibility 0.2s ease, transform 0.2s ease;
 }
 
 .tooltip::after {

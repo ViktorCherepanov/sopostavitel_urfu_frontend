@@ -7,68 +7,74 @@ import type {
 } from "../../../types/TableRowData.ts";
 import {MOCK_DATA} from "../../../mocks/tableMockData.ts";
 import {useTableSort} from "../../../hooks/useTableSort.ts";
-import {useTablePagination} from "../../../hooks/useTablePagination.ts";
+import {CmsNameCell} from "./CmsNameCell/CmsNameCell.tsx";
+import {getStatusByPercentage} from "../../../utils/getStatusByPercentage.ts";
+import {COLOR, STATUS_ORDER} from "../../../utils/statusConfig.ts";
 
-const STATUS_ORDER: Record<MatchStatus, MatchStatus[]> = {
-  green: ['green', 'yellow', 'red'],
-  yellow: ['yellow', 'green', 'red'],
-  red: ['red', 'yellow', 'green'],
-};
-
-const COLOR: Record<MatchStatus, string> = {
-  green: '#2B9348',
-  yellow: '#FFBF3B',
-  red: '#CC313D',
-};
+const CHUNK_SIZE = 50;
 
 export const ResultsTable = () => {
   const [searchQuery, setSearchQuery] = useState('');
   const [cmsFilter, setCmsFilter] = useState<MatchStatus>('red');
   const [activeSortType, setActiveSortType] = useState<ActiveSort>(null);
+  const [tableData, setTableData] = useState<TableRowData[]>(MOCK_DATA);
+
+  const [visibleCount, setVisibleCount] = useState(CHUNK_SIZE);
 
   const {sortConfig, handleSort, resetSort, sort} = useTableSort();
-  const {paginate} = useTablePagination(15);
 
-  const filteredData = MOCK_DATA.filter((row) =>
+  const filteredData = tableData.filter((row) =>
     row.supplierName.toLowerCase().includes(searchQuery.toLowerCase()) ||
     row.id.toLowerCase().includes(searchQuery.toLowerCase())
   );
 
   const orderedData = activeSortType === 'status'
-    ? [...filteredData].sort((a, b) =>
-      STATUS_ORDER[cmsFilter].indexOf(a.matchStatus) -
-      STATUS_ORDER[cmsFilter].indexOf(b.matchStatus)
-    )
+    ? [...filteredData].sort((a, b) => {
+      const statusA = getStatusByPercentage(a.matchPercentage, a.manuallyMatched);
+      const statusB = getStatusByPercentage(b.matchPercentage, a.manuallyMatched);
+      return (
+        STATUS_ORDER[cmsFilter].indexOf(statusA) -
+        STATUS_ORDER[cmsFilter].indexOf(statusB)
+      );
+    })
     : sort(filteredData);
 
-  const {
-    currentRows,
-    totalPages,
-    currentPage,
-    goNext,
-    goPrev,
-    reset
-  } = paginate(orderedData);
+  const currentRows = orderedData.slice(0, visibleCount);
+
+  const handleScroll = (e: React.UIEvent<HTMLDivElement>) => {
+    const target = e.currentTarget;
+    // Если доскроллили до конца (оставляем запас 100px для плавности подгрузки)
+    if (target.scrollHeight - target.scrollTop <= target.clientHeight + 100) {
+      if (visibleCount < orderedData.length) {
+        setVisibleCount((prev) => Math.min(prev + CHUNK_SIZE, orderedData.length));
+      }
+    }
+  };
 
 
   const handleCmsFilterClick = () => {
-    setActiveSortType('status');
+    if (activeSortType !== 'status') {
+      setActiveSortType('status');
+      setCmsFilter('red');
+    } else {
+      setCmsFilter(prev =>
+        prev === 'red' ? 'yellow' : prev === 'yellow' ? 'green' : 'red'
+      );
+    }
+
     resetSort();
-    setCmsFilter(prev =>
-      prev === 'red' ? 'yellow' : prev === 'yellow' ? 'green' : 'red'
-    );
-    reset();
+    setVisibleCount(CHUNK_SIZE);
   };
 
   const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setSearchQuery(e.target.value);
-    reset();
+    setVisibleCount(CHUNK_SIZE);
   };
 
   const handleSortWithReset = (key: keyof TableRowData) => {
     setActiveSortType('column');
     handleSort(key);
-    reset();
+    setVisibleCount(CHUNK_SIZE);
   };
 
   const [topColor, midColor, botColor] = STATUS_ORDER[cmsFilter].map(s => COLOR[s]);
@@ -115,7 +121,7 @@ export const ResultsTable = () => {
         </div>
       </div>
 
-      <div className={styles.tableWrapper}>
+      <div className={styles.tableWrapper} onScroll={handleScroll}>
         <table className={styles.table}>
           <thead>
           <tr>
@@ -158,7 +164,23 @@ export const ResultsTable = () => {
               <tr key={row.id}>
                 <td className={styles.boldText}>{row.id}</td>
                 <td>{row.supplierName}</td>
-                <td>{row.cmsName}</td>
+                <td>
+                  <CmsNameCell
+                    cmsName={row.cmsName}
+                    matchPercentage={row.matchPercentage}
+                    manuallyMatched={row.manuallyMatched}
+                    suggestedNames={row.suggestedCmsNames}
+                    onSelectAlternative={(newName) => {
+                      setTableData(prevData =>
+                        prevData.map(item =>
+                          item.id === row.id
+                            ? {...item, cmsName: newName, manuallyMatched: true}
+                            : item
+                        )
+                      );
+                    }}
+                  />
+                </td>
                 <td className={styles.textRight}>{row.quantity}</td>
                 <td className={styles.textRight}>
                   <div className={styles.priceTooltipWrapper}>
@@ -182,36 +204,8 @@ export const ResultsTable = () => {
       </div>
 
       <div className={styles.footer}>
-        <div className={styles.pagination}>
-          <button
-            onClick={goPrev}
-            disabled={currentPage === 1}
-            className={styles.pageBtn}
-            aria-label="Предыдущая страница"
-          >
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none"
-                 xmlns="http://www.w3.org/2000/svg">
-              <path d="M15 19L8 12L15 5" stroke="currentColor" strokeWidth="1.5"
-                    strokeLinecap="round" strokeLinejoin="round"/>
-            </svg>
-          </button>
-
-          <span className={styles.pageIndicator}>
-            Страница {currentPage} из {totalPages || 1}
-          </span>
-
-          <button
-            onClick={goNext}
-            disabled={currentPage === totalPages || totalPages === 0}
-            className={styles.pageBtn}
-            aria-label="Следующая страница"
-          >
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none"
-                 xmlns="http://www.w3.org/2000/svg">
-              <path d="M9 5L16 12L9 19" stroke="currentColor" strokeWidth="1.5"
-                    strokeLinecap="round" strokeLinejoin="round"/>
-            </svg>
-          </button>
+        <div className={styles.rowCountIndicator}>
+          Отображено: <strong>{currentRows.length}</strong> из <strong>{orderedData.length}</strong>
         </div>
 
         <button className={`${styles.downloadBtn} brutal-shadow`}>

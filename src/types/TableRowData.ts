@@ -4,7 +4,9 @@ export interface TableRowData {
   cmsName: string;
   quantity: number;
   price: number;
-  matchStatus: MatchStatus;
+  matchPercentage: number;
+  suggestedCmsNames?: string[];
+  manuallyMatched?: boolean;
 }
 
 export type MatchStatus = 'red' | 'yellow' | 'green';

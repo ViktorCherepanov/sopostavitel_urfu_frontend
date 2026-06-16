@@ -1,4 +1,4 @@
-import {Sidebar} from "./components/layout/sidebar.tsx";
+import {Sidebar} from "./components/layout/Sidebar.tsx";
 import {MainPage} from "./pages/MainPage.tsx";
 
 function App() {

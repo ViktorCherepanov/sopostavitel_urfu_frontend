@@ -1,8 +1,10 @@
 .pageContainer {
   flex-grow: 1;
   width: 100%;
-  min-height: 100vh;
+  height: 100vh;
+  max-height: 100vh;
   padding: 32px 28px;
+  box-sizing: border-box;
   background-image: url("/img/bg-main-screen.png");
   position: relative;
   display: flex;
