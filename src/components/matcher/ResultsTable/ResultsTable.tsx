@@ -1,36 +1,37 @@
 import React, {useState} from 'react';
-import { useNavigate } from 'react-router-dom';
+import {useNavigate} from 'react-router-dom';
 import styles from './ResultsTable.module.css';
 import type {
   ActiveSort,
   MatchStatus,
   TableRowData
 } from "../../../types/TableRowData.ts";
-import {MOCK_DATA} from "../../../mocks/tableMockData.ts";
 import {useTableSort} from "../../../hooks/useTableSort.ts";
 import {CmsNameCell} from "./CmsNameCell/CmsNameCell.tsx";
 import {getStatusByPercentage} from "../../../utils/getStatusByPercentage.ts";
 import {COLOR, STATUS_ORDER} from "../../../utils/statusConfig.ts";
 import {DownloadModal} from "../DownloadModal/DownloadModal.tsx";
+import {exportFile} from "../../../api/matchService.ts";
+import {mapTableRowToDto} from "../../../utils/mapApiToTableRow.ts";
 
 interface ResultsTableProps {
-  sessionId?: string;
+  initialData: TableRowData[];
 }
 
 const CHUNK_SIZE = 50;
 
-export const ResultsTable: React.FC<ResultsTableProps> = ({ sessionId }) => {
+export const ResultsTable: React.FC<ResultsTableProps> = ({initialData}) => {
   const navigate = useNavigate();
-
   const [searchQuery, setSearchQuery] = useState('');
   const [cmsFilter, setCmsFilter] = useState<MatchStatus>('red');
   const [activeSortType, setActiveSortType] = useState<ActiveSort>(null);
-  const [tableData, setTableData] = useState<TableRowData[]>(MOCK_DATA);
   const [isModalOpen, setIsModalOpen] = useState(false);
-
+  const [isExporting, setIsExporting] = useState(false);
+  const [exportError, setExportError] = useState<string | null>(null);
   const [visibleCount, setVisibleCount] = useState(CHUNK_SIZE);
-
   const {sortConfig, handleSort, resetSort, sort} = useTableSort();
+  const [tableData, setTableData] = useState<TableRowData[]>(initialData);
+
 
   const filteredData = tableData.filter((row) =>
     row.supplierName.toLowerCase().includes(searchQuery.toLowerCase()) ||
@@ -58,7 +59,6 @@ export const ResultsTable: React.FC<ResultsTableProps> = ({ sessionId }) => {
       }
     }
   };
-
 
   const handleCmsFilterClick = () => {
     if (activeSortType !== 'status') {
@@ -93,9 +93,18 @@ export const ResultsTable: React.FC<ResultsTableProps> = ({ sessionId }) => {
     return sortConfig.direction === 'asc' ? ' ↑' : ' ↓';
   };
 
-  const handleDownload = () => {
-    console.log(`Отправка данных сессии [${sessionId || 'ID_NOT_FOUND'}] на бэкэнд:`, tableData);
-    setIsModalOpen(true);
+  const handleDownload = async () => {
+    setIsExporting(true);
+    setExportError(null);
+    try {
+      const dto = tableData.map(mapTableRowToDto);
+      await exportFile(dto);
+      setIsModalOpen(true);
+    } catch (err) {
+      setExportError(err instanceof Error ? err.message : 'Ошибка экспорта');
+    } finally {
+      setIsExporting(false);
+    }
   };
 
 
@@ -148,7 +157,7 @@ export const ResultsTable: React.FC<ResultsTableProps> = ({ sessionId }) => {
             </th>
             <th onClick={handleCmsFilterClick}
                 className={styles.sortableHeader}>
-              <div style={{display: 'flex', alignItems: 'center', gap: '6px'}}>
+              <div className={styles.cmsHeaderCell}>
                 Наименование в CMS
                 <svg width="24" height="24" viewBox="0 0 24 24" fill="none"
                      xmlns="http://www.w3.org/2000/svg" style={{flexShrink: 0}}>
@@ -221,10 +230,16 @@ export const ResultsTable: React.FC<ResultsTableProps> = ({ sessionId }) => {
           Отображено: <strong>{currentRows.length}</strong> из <strong>{orderedData.length}</strong>
         </div>
 
-        <button onClick={handleDownload}
-                className={`${styles.downloadBtn} brutal-shadow`}
+        {exportError && (
+          <p className={styles.exportError}>{exportError}</p>
+        )}
+
+        <button
+          onClick={handleDownload}
+          disabled={isExporting}
+          className={`${styles.downloadBtn} brutal-shadow`}
         >
-          <span>Скачать файл</span>
+          <span>{isExporting ? 'Экспортируем...' : 'Скачать файл'}</span>
           <svg className={styles.downloadIcon} width="28" height="28"
                viewBox="0 0 28 28" fill="none"
                xmlns="http://www.w3.org/2000/svg">

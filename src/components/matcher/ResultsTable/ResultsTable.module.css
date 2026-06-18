@@ -273,3 +273,16 @@
   opacity: 1;
   visibility: visible;
 }
+
+.cmsHeaderCell {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.exportError {
+  font-family: var(--font-arimo), sans-serif;
+  font-size: 14px;
+  color: var(--red-color, #CC313D);
+  margin: 0;
+}

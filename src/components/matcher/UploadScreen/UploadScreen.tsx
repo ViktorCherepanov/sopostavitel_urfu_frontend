@@ -1,28 +1,38 @@
 import styles from './UploadScreen.module.css';
 import {type ChangeEvent, useRef, useState} from "react";
 import { type DragEvent } from "react";
+import type {TableRowData} from "../../../types/TableRowData.ts";
+import {uploadFile} from "../../../api/matchService.ts";
+import {mapApiToTableRow} from "../../../utils/mapApiToTableRow.ts";
 
 interface UploadScreenProps {
-  onUploadSuccess: (sessionId: string) => void;
+  onUploadSuccess: (sessionId: string, data: TableRowData[]) => void;
 }
 
 export const UploadScreen = ({onUploadSuccess}: UploadScreenProps) => {
   const dragCounter = useRef(0);
-
   const [isDragging, setIsDragging] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
-  const handleFiles = (files: FileList | null) => {
+  const handleFiles = async (files: FileList | null) => {
     if (!files || files.length === 0) return;
-
     const file = files[0];
-    console.log('Файл принят на обработку:', file.name);
 
-    // Генерируем временный ID сессии, пока нет интеграции с бэком
-    const mockSessionId = `session_${Math.random().toString(36).substring(2, 9)}`;
+    setIsLoading(true);
+    setError(null);
 
-    // Передаем этот ID в родительский компонент
-    onUploadSuccess(mockSessionId);
+    try {
+      const dto = await uploadFile(file);
+      const tableData = dto.map(mapApiToTableRow);
+      const sessionId = `session_${Math.random().toString(36).substring(2, 9)}`;
+      onUploadSuccess(sessionId, tableData);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Неизвестная ошибка');
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   const handleButtonClick = () => {
@@ -50,7 +60,6 @@ export const UploadScreen = ({onUploadSuccess}: UploadScreenProps) => {
     e.preventDefault();
     dragCounter.current = 0;
     setIsDragging(false);
-
     if (e.dataTransfer.files && e.dataTransfer.files.length > 0) {
       handleFiles(e.dataTransfer.files);
     }
@@ -76,8 +85,9 @@ export const UploadScreen = ({onUploadSuccess}: UploadScreenProps) => {
       />
       <h2 className={styles.title}>Начнем работу,<br/> загрузите ваш файл</h2>
       <button onClick={handleButtonClick}
-              className={`${styles.uploadBtn} brutal-shadow`}>
-        <span>Загрузить файл</span>
+              className={`${styles.uploadBtn} brutal-shadow`}
+              disabled={isLoading}>
+        <span>{isLoading ? 'Загружаем...' : 'Загрузить файл'}</span>
         <svg width="26" height="26" viewBox="0 0 26 26" fill="none"
              xmlns="http://www.w3.org/2000/svg">
           <path
@@ -86,6 +96,9 @@ export const UploadScreen = ({onUploadSuccess}: UploadScreenProps) => {
             strokeLinejoin="round"/>
         </svg>
       </button>
+      {error && (
+        <p className={styles.errorText}>{error}</p>
+      )}
       {isDragging && (
         <div
           className={styles.dragOverlay}
