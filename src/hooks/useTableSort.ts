@@ -21,8 +21,18 @@ export const useTableSort = () => {
     [...data].sort((a, b) => {
       if (!sortConfig) return 0;
       const { key, direction } = sortConfig;
-      if (a[key] < b[key]) return direction === 'asc' ? -1 : 1;
-      if (a[key] > b[key]) return direction === 'asc' ? 1 : -1;
+
+      const valA = a[key];
+      const valB = b[key];
+
+      if (valA === valB) return 0;
+
+      if (valA == null) return 1;
+      if (valB == null) return -1;
+
+      if (valA < valB) return direction === 'asc' ? -1 : 1;
+      if (valA > valB) return direction === 'asc' ? 1 : -1;
+
       return 0;
     });
 

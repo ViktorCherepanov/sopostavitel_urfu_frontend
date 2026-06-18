@@ -3,7 +3,7 @@ import {type ChangeEvent, useRef, useState} from "react";
 import { type DragEvent } from "react";
 
 interface UploadScreenProps {
-  onUploadSuccess: () => void;
+  onUploadSuccess: (sessionId: string) => void;
 }
 
 export const UploadScreen = ({onUploadSuccess}: UploadScreenProps) => {
@@ -18,8 +18,11 @@ export const UploadScreen = ({onUploadSuccess}: UploadScreenProps) => {
     const file = files[0];
     console.log('Файл принят на обработку:', file.name);
 
-    // Тут в будущем будет отправка через FormData на бэкенд
-    onUploadSuccess();
+    // Генерируем временный ID сессии, пока нет интеграции с бэком
+    const mockSessionId = `session_${Math.random().toString(36).substring(2, 9)}`;
+
+    // Передаем этот ID в родительский компонент
+    onUploadSuccess(mockSessionId);
   };
 
   const handleButtonClick = () => {

@@ -2,9 +2,9 @@ import { z } from 'zod';
 
 export const ProductMatchSchema = z.object({
   id: z.string(),
-  originalName: z.string(), // Как товар назывался в файле клиента
-  matchedName: z.string().nullable(), // Как товар называется в нашей базе (если найдено)
-  matchScore: z.number().min(0).max(100), // Процент совпадения
+  originalName: z.string(),
+  matchedName: z.string().nullable(),
+  matchScore: z.number().min(0).max(100),
   status: z.enum(['matched', 'review_needed', 'unmatched']),
 })
 

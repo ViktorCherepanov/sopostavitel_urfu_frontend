@@ -9,7 +9,6 @@ export const MOCK_DATA: TableRowData[] = Array.from({ length: 412 }, (_, i) => {
 
   if (zoneType === 0) {
     matchPercentage = Math.floor(Math.random() * 16) + 85; // от 85% до 100%
-    // suggestedCmsNames оставляем пустым, так как система уверена
   }
   else if (zoneType === 1) {
     matchPercentage = Math.floor(Math.random() * 35) + 45; // от 45% до 79%
@@ -21,7 +20,6 @@ export const MOCK_DATA: TableRowData[] = Array.from({ length: 412 }, (_, i) => {
     ];
   }
   else {
-    // --- КРАСНАЯ ЗОНА (Низкая уверенность, нужен ручной выбор) ---
     matchPercentage = Math.floor(Math.random() * 35) + 5; // от 5% до 39%
     cmsName = 'Не сопоставлено (Требуется ручной выбор)';
     suggestedCmsNames = [

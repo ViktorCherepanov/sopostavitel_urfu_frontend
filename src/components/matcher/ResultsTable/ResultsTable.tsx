@@ -1,4 +1,5 @@
-import {useState} from 'react';
+import React, {useState} from 'react';
+import { useNavigate } from 'react-router-dom';
 import styles from './ResultsTable.module.css';
 import type {
   ActiveSort,
@@ -10,14 +11,22 @@ import {useTableSort} from "../../../hooks/useTableSort.ts";
 import {CmsNameCell} from "./CmsNameCell/CmsNameCell.tsx";
 import {getStatusByPercentage} from "../../../utils/getStatusByPercentage.ts";
 import {COLOR, STATUS_ORDER} from "../../../utils/statusConfig.ts";
+import {DownloadModal} from "../DownloadModal/DownloadModal.tsx";
+
+interface ResultsTableProps {
+  sessionId?: string;
+}
 
 const CHUNK_SIZE = 50;
 
-export const ResultsTable = () => {
+export const ResultsTable: React.FC<ResultsTableProps> = ({ sessionId }) => {
+  const navigate = useNavigate();
+
   const [searchQuery, setSearchQuery] = useState('');
   const [cmsFilter, setCmsFilter] = useState<MatchStatus>('red');
   const [activeSortType, setActiveSortType] = useState<ActiveSort>(null);
   const [tableData, setTableData] = useState<TableRowData[]>(MOCK_DATA);
+  const [isModalOpen, setIsModalOpen] = useState(false);
 
   const [visibleCount, setVisibleCount] = useState(CHUNK_SIZE);
 
@@ -31,7 +40,7 @@ export const ResultsTable = () => {
   const orderedData = activeSortType === 'status'
     ? [...filteredData].sort((a, b) => {
       const statusA = getStatusByPercentage(a.matchPercentage, a.manuallyMatched);
-      const statusB = getStatusByPercentage(b.matchPercentage, a.manuallyMatched);
+      const statusB = getStatusByPercentage(b.matchPercentage, b.manuallyMatched);
       return (
         STATUS_ORDER[cmsFilter].indexOf(statusA) -
         STATUS_ORDER[cmsFilter].indexOf(statusB)
@@ -43,7 +52,6 @@ export const ResultsTable = () => {
 
   const handleScroll = (e: React.UIEvent<HTMLDivElement>) => {
     const target = e.currentTarget;
-    // Если доскроллили до конца (оставляем запас 100px для плавности подгрузки)
     if (target.scrollHeight - target.scrollTop <= target.clientHeight + 100) {
       if (visibleCount < orderedData.length) {
         setVisibleCount((prev) => Math.min(prev + CHUNK_SIZE, orderedData.length));
@@ -83,6 +91,11 @@ export const ResultsTable = () => {
     if (activeSortType !== 'column') return null;
     if (sortConfig?.key !== key) return null;
     return sortConfig.direction === 'asc' ? ' ↑' : ' ↓';
+  };
+
+  const handleDownload = () => {
+    console.log(`Отправка данных сессии [${sessionId || 'ID_NOT_FOUND'}] на бэкэнд:`, tableData);
+    setIsModalOpen(true);
   };
 
 
@@ -208,7 +221,9 @@ export const ResultsTable = () => {
           Отображено: <strong>{currentRows.length}</strong> из <strong>{orderedData.length}</strong>
         </div>
 
-        <button className={`${styles.downloadBtn} brutal-shadow`}>
+        <button onClick={handleDownload}
+                className={`${styles.downloadBtn} brutal-shadow`}
+        >
           <span>Скачать файл</span>
           <svg className={styles.downloadIcon} width="28" height="28"
                viewBox="0 0 28 28" fill="none"
@@ -219,6 +234,15 @@ export const ResultsTable = () => {
           </svg>
         </button>
       </div>
+
+      <DownloadModal
+        isOpen={isModalOpen}
+        onClose={() => setIsModalOpen(false)}
+        onGoHome={() => {
+          setIsModalOpen(false);
+          navigate('/');
+        }}
+      />
     </div>
   );
 };
